@@ -14,7 +14,11 @@ import {
 } from "@/components/ui/select";
 import { splitPdfToTiles } from "@/lib/pdf/splitPdf";
 import { calcGrid, PAPER_SIZES_MM, type PaperSize } from "@/lib/pdf/paperSizes";
-import SplitPreview from "@/components/pdf/SplitPreview";
+import dynamic from "next/dynamic";
+
+const SplitPreview = dynamic(() => import("@/components/pdf/SplitPreview"), {
+  ssr: false,
+});
 
 export default function SplitForm() {
   const [file, setFile] = useState<File | null>(null);
