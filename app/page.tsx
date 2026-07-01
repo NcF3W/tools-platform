@@ -31,6 +31,15 @@ export default function Home() {
             </CardHeader>
           </Card>
         </Link>
+
+        <Link href="/chemie">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <CardTitle>Chemie-Tools</CardTitle>
+              <CardDescription>Strukturformeln und mehr</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
     </main>
   );

@@ -22,6 +22,15 @@ export default function LatexPage() {
             </CardHeader>
           </Card>
         </Link>
+
+        <Link href="/latex/structure">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <CardTitle>Strukturformel</CardTitle>
+              <CardDescription>SMILES-Code zu Strukturformel</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
     </main>
   );

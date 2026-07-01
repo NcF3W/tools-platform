@@ -31,6 +31,35 @@ export default function PdfPage() {
             </CardHeader>
           </Card>
         </Link>
+
+        <Link href="/pdf/merge">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <CardTitle>Zusammenführen</CardTitle>
+              <CardDescription>Mehrere PDFs zu einem verbinden</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/pdf/pages">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <CardTitle>Seiten anordnen & löschen</CardTitle>
+              <CardDescription>
+                Reihenfolge ändern, einzelne Seiten entfernen
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/pdf/to-images">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <CardTitle>PDF → PNG</CardTitle>
+              <CardDescription>Seiten als Bilder exportieren</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
     </main>
   );
