@@ -5,7 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Table2, FlaskConical } from "lucide-react";
+import { Table2, FlaskConical, Zap } from "lucide-react";
 
 export default function LatexPage() {
   return (
@@ -31,6 +31,18 @@ export default function LatexPage() {
               <FlaskConical className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Strukturformel</CardTitle>
               <CardDescription>SMILES-Code zu Strukturformel</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/latex/energy-diagram">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <Zap className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Energieniveau-Diagramm</CardTitle>
+              <CardDescription>
+                MO-Schemas, Bänderdiagramme als TikZ
+              </CardDescription>
             </CardHeader>
           </Card>
         </Link>
