@@ -5,6 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Table2, FlaskConical } from "lucide-react";
 
 export default function LatexPage() {
   return (
@@ -15,6 +16,7 @@ export default function LatexPage() {
         <Link href="/latex/table">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <Table2 className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Tabellengenerator</CardTitle>
               <CardDescription>
                 Daten rein, fertiger booktabs-Code raus
@@ -26,6 +28,7 @@ export default function LatexPage() {
         <Link href="/latex/structure">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <FlaskConical className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Strukturformel</CardTitle>
               <CardDescription>SMILES-Code zu Strukturformel</CardDescription>
             </CardHeader>

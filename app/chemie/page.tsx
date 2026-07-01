@@ -5,6 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { FlaskConical } from "lucide-react";
 
 export default function ChemiePage() {
   return (
@@ -15,6 +16,7 @@ export default function ChemiePage() {
         <Link href="/latex/structure">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <FlaskConical className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Strukturformel</CardTitle>
               <CardDescription>
                 SMILES-Code zu Strukturformel (Bild + chemfig-Code)

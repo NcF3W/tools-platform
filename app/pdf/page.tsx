@@ -5,6 +5,13 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import {
+  Scissors,
+  Image as ImageIcon,
+  Combine,
+  ListOrdered,
+  FileImage,
+} from "lucide-react";
 
 export default function PdfPage() {
   return (
@@ -15,6 +22,7 @@ export default function PdfPage() {
         <Link href="/pdf/split">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <Scissors className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Poster aufteilen</CardTitle>
               <CardDescription>
                 A1 → 4× A3 zum selbst Ausdrucken
@@ -26,6 +34,7 @@ export default function PdfPage() {
         <Link href="/pdf/convert">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <ImageIcon className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>PNG → PDF</CardTitle>
               <CardDescription>Bilder in ein PDF umwandeln</CardDescription>
             </CardHeader>
@@ -35,6 +44,7 @@ export default function PdfPage() {
         <Link href="/pdf/merge">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <Combine className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Zusammenführen</CardTitle>
               <CardDescription>Mehrere PDFs zu einem verbinden</CardDescription>
             </CardHeader>
@@ -44,6 +54,7 @@ export default function PdfPage() {
         <Link href="/pdf/pages">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <ListOrdered className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Seiten anordnen & löschen</CardTitle>
               <CardDescription>
                 Reihenfolge ändern, einzelne Seiten entfernen
@@ -55,6 +66,7 @@ export default function PdfPage() {
         <Link href="/pdf/to-images">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <FileImage className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>PDF → PNG</CardTitle>
               <CardDescription>Seiten als Bilder exportieren</CardDescription>
             </CardHeader>

@@ -5,6 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { FileText, BookOpen, FlaskConical } from "lucide-react";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <Link href="/pdf">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <FileText className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>PDF-Tools</CardTitle>
               <CardDescription>
                 Teilen, konvertieren, zusammenführen
@@ -26,6 +28,7 @@ export default function Home() {
         <Link href="/latex">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <BookOpen className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>LaTeX-Tools</CardTitle>
               <CardDescription>Tabellen, Vorlagen und mehr</CardDescription>
             </CardHeader>
@@ -35,6 +38,7 @@ export default function Home() {
         <Link href="/chemie">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
+              <FlaskConical className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Chemie-Tools</CardTitle>
               <CardDescription>Strukturformeln und mehr</CardDescription>
             </CardHeader>

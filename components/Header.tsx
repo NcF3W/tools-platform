@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { FileText, BookOpen, FlaskConical } from "lucide-react";
 
 const navItems = [
-  { href: "/pdf", label: "PDF-Tools" },
-  { href: "/latex", label: "LaTeX-Tools" },
-  { href: "/chemie", label: "Chemie-Tools" },
+  { href: "/pdf", label: "PDF-Tools", icon: FileText },
+  { href: "/latex", label: "LaTeX-Tools", icon: BookOpen },
+  { href: "/chemie", label: "Chemie-Tools", icon: FlaskConical },
 ];
 
 export default function Header() {
@@ -18,8 +19,9 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
             >
+              <item.icon className="w-4 h-4" />
               {item.label}
             </Link>
           ))}
