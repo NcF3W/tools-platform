@@ -16,6 +16,7 @@ const defaultParams: MorseParams = { De: 4.52, re: 0.74, a: 1.94 };
 
 const SCALE = 90;
 const PADDING = 0.4;
+const LABEL_MARGIN_PX = 90; // Platz für "De = ..."-Beschriftung rechts der Achse
 
 export default function PotentialCurveForm() {
   const [params, setParams] = useState<MorseParams>(defaultParams);
@@ -36,7 +37,8 @@ export default function PotentialCurveForm() {
   const boundsMinY = bounds.axisYBottom;
   const boundsMaxY = bounds.axisYTop;
 
-  const svgWidth = (boundsMaxX - boundsMinX + 2 * PADDING) * SCALE;
+  const svgWidth =
+    (boundsMaxX - boundsMinX + 2 * PADDING) * SCALE + LABEL_MARGIN_PX;
   const svgHeight = (boundsMaxY - boundsMinY + 2 * PADDING) * SCALE;
 
   function toSvgX(x: number) {
