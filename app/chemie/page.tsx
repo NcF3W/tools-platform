@@ -5,7 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { FlaskConical } from "lucide-react";
+import { FlaskConical, TrendingUp, Waves, Zap } from "lucide-react";
 
 export default function ChemiePage() {
   return (
@@ -20,6 +20,42 @@ export default function ChemiePage() {
               <CardTitle>Strukturformel</CardTitle>
               <CardDescription>
                 SMILES-Code zu Strukturformel (Bild + chemfig-Code)
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/latex/energy-diagram">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <Zap className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Energieniveau-Diagramm</CardTitle>
+              <CardDescription>
+                MO-Schemas, Bänderdiagramme als TikZ
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/latex/reaction-diagram">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <TrendingUp className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Reaktionsenergiediagramm</CardTitle>
+              <CardDescription>
+                Edukte → Übergangszustand → Produkte, mit Ea und ΔH
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/latex/potential-curve">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <Waves className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Potentialkurve (Morse)</CardTitle>
+              <CardDescription>
+                Energie vs. Bindungsabstand, Bindungsdissoziation
               </CardDescription>
             </CardHeader>
           </Card>
