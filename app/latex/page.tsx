@@ -5,7 +5,14 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Table2, FlaskConical, Zap, TrendingUp, Waves } from "lucide-react";
+import {
+  Table2,
+  FlaskConical,
+  Zap,
+  TrendingUp,
+  Waves,
+  GitFork,
+} from "lucide-react";
 
 export default function LatexPage() {
   return (
@@ -66,6 +73,18 @@ export default function LatexPage() {
               <CardTitle>Potentialkurve (Morse)</CardTitle>
               <CardDescription>
                 Energie vs. Bindungsabstand, Bindungsdissoziation
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/latex/ligand-field">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <GitFork className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Ligandenfeldaufspaltung</CardTitle>
+              <CardDescription>
+                d-Orbitalaufspaltung, Elektronenbesetzung, CFSE
               </CardDescription>
             </CardHeader>
           </Card>

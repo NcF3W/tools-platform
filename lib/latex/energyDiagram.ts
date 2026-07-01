@@ -11,6 +11,10 @@ export interface EnergyLevel {
   label: string;
   electrons: 0 | 1 | 2;
   copies: number;
+  // Optional: individuelle Besetzung pro entartetem Orbital (Index = copyIndex),
+  // z.B. für Ligandenfeld-Aufspaltung, wo entartete Orbitale ungleich besetzt sein können.
+  // Fehlt dieses Feld, wird `electrons` einheitlich für alle Kopien verwendet.
+  copyElectrons?: (0 | 1 | 2)[];
 }
 
 export interface EnergyConnection {
@@ -93,7 +97,7 @@ export function computeLayout(columns: EnergyColumn[], levels: EnergyLevel[]) {
         y: level.height,
         halfWidth: width / 2,
         label: level.label,
-        electrons: level.electrons,
+        electrons: level.copyElectrons?.[i] ?? level.electrons,
         showLabel: i === 0,
         color,
       });

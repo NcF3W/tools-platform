@@ -11,6 +11,7 @@ import {
   Combine,
   ListOrdered,
   FileImage,
+  Wand2,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -65,8 +66,10 @@ export default function PdfPage() {
             <Card className="hover:border-primary transition-colors cursor-pointer">
               <CardHeader>
                 <ImageIcon className="w-6 h-6 mb-2 text-primary" />
-                <CardTitle>PNG → PDF</CardTitle>
-                <CardDescription>Bilder in ein PDF umwandeln</CardDescription>
+                <CardTitle>Bilder → PDF</CardTitle>
+                <CardDescription>
+                  PNG oder JPG/JPEG in ein PDF umwandeln
+                </CardDescription>
               </CardHeader>
             </Card>
           </Link>
@@ -77,6 +80,18 @@ export default function PdfPage() {
                 <FileImage className="w-6 h-6 mb-2 text-primary" />
                 <CardTitle>PDF → PNG</CardTitle>
                 <CardDescription>Seiten als Bilder exportieren</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+
+          <Link href="/pdf/remove-background">
+            <Card className="hover:border-primary transition-colors cursor-pointer">
+              <CardHeader>
+                <Wand2 className="w-6 h-6 mb-2 text-primary" />
+                <CardTitle>PNG freistellen</CardTitle>
+                <CardDescription>
+                  Einfarbigen Hintergrund per Klick transparent machen
+                </CardDescription>
               </CardHeader>
             </Card>
           </Link>

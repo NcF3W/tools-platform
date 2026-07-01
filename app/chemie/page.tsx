@@ -5,7 +5,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { FlaskConical, TrendingUp, Waves, Zap } from "lucide-react";
+import { FlaskConical, TrendingUp, Waves, Zap, GitFork } from "lucide-react";
 
 export default function ChemiePage() {
   return (
@@ -56,6 +56,18 @@ export default function ChemiePage() {
               <CardTitle>Potentialkurve (Morse)</CardTitle>
               <CardDescription>
                 Energie vs. Bindungsabstand, Bindungsdissoziation
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/latex/ligand-field">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <GitFork className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Ligandenfeldaufspaltung</CardTitle>
+              <CardDescription>
+                d-Orbitalaufspaltung, Elektronenbesetzung, CFSE
               </CardDescription>
             </CardHeader>
           </Card>
