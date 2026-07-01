@@ -1,15 +1,28 @@
 import { PDFDocument } from "pdf-lib";
 
-export async function mergePdfs(files: File[]): Promise<Uint8Array> {
-  const mergedDoc = await PDFDocument.create();
+export interface MergePageRef {
+  fileIndex: number; // Index in das übergebene files-Array
+  pageIndex: number; // 0-basierter Seitenindex innerhalb dieser Datei
+}
 
-  for (const file of files) {
-    const bytes = await file.arrayBuffer();
-    const srcDoc = await PDFDocument.load(bytes);
-    const pageIndices = srcDoc.getPageIndices();
-    const copiedPages = await mergedDoc.copyPages(srcDoc, pageIndices);
-    copiedPages.forEach((page) => mergedDoc.addPage(page));
+export async function mergeAndReorderPdfs(
+  files: File[],
+  pageOrder: MergePageRef[],
+): Promise<Uint8Array> {
+  const outDoc = await PDFDocument.create();
+
+  const neededFileIndices = new Set(pageOrder.map((p) => p.fileIndex));
+  const srcDocs = new Map<number, PDFDocument>();
+  for (const idx of neededFileIndices) {
+    const bytes = await files[idx].arrayBuffer();
+    srcDocs.set(idx, await PDFDocument.load(bytes));
   }
 
-  return mergedDoc.save();
+  for (const ref of pageOrder) {
+    const srcDoc = srcDocs.get(ref.fileIndex)!;
+    const [copiedPage] = await outDoc.copyPages(srcDoc, [ref.pageIndex]);
+    outDoc.addPage(copiedPage);
+  }
+
+  return outDoc.save();
 }

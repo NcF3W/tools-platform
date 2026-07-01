@@ -1,50 +1,121 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
+import { PDFDocument } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { mergePdfs } from "@/lib/pdf/mergePdf";
+import { mergeAndReorderPdfs } from "@/lib/pdf/mergePdf";
+
+const PageThumbnail = dynamic(() => import("@/components/pdf/PageThumbnail"), {
+  ssr: false,
+});
+
+function uid() {
+  return Math.random().toString(36).slice(2, 9);
+}
+
+interface FileEntry {
+  id: string;
+  file: File;
+}
+
+interface PageEntry {
+  fileId: string;
+  pageIndex: number; // 0-basiert, innerhalb der zugehörigen Datei
+  removed: boolean;
+}
 
 export default function MergeForm() {
-  const [files, setFiles] = useState<File[]>([]);
+  const [fileEntries, setFileEntries] = useState<FileEntry[]>([]);
+  const [pageEntries, setPageEntries] = useState<PageEntry[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? []);
-    setFiles((prev) => [...prev, ...selected]);
     e.target.value = ""; // erlaubt erneutes Auswählen derselben Datei
+    setError(null);
+
+    for (const file of selected) {
+      const id = uid();
+      try {
+        const bytes = await file.arrayBuffer();
+        const doc = await PDFDocument.load(bytes);
+        const count = doc.getPageCount();
+        setFileEntries((prev) => [...prev, { id, file }]);
+        setPageEntries((prev) => [
+          ...prev,
+          ...Array.from({ length: count }, (_, i) => ({
+            fileId: id,
+            pageIndex: i,
+            removed: false,
+          })),
+        ]);
+      } catch (err) {
+        console.error(err);
+        setError(`Datei "${file.name}" konnte nicht gelesen werden.`);
+      }
+    }
   }
 
-  function moveUp(idx: number) {
-    if (idx === 0) return;
-    setFiles((prev) => {
+  function removeFileEntry(id: string) {
+    setFileEntries((prev) => prev.filter((f) => f.id !== id));
+    setPageEntries((prev) => prev.filter((p) => p.fileId !== id));
+  }
+
+  function togglePageRemoved(idx: number) {
+    setPageEntries((prev) =>
+      prev.map((p, i) => (i === idx ? { ...p, removed: !p.removed } : p)),
+    );
+  }
+
+  function handleDragStart(idx: number) {
+    setDraggedIdx(idx);
+  }
+
+  function handleDragOver(e: React.DragEvent, idx: number) {
+    e.preventDefault(); // notwendig, damit "drop" überhaupt feuert
+    if (idx !== dragOverIdx) setDragOverIdx(idx);
+  }
+
+  function handleDrop(idx: number) {
+    if (draggedIdx === null || draggedIdx === idx) {
+      setDraggedIdx(null);
+      setDragOverIdx(null);
+      return;
+    }
+    setPageEntries((prev) => {
       const copy = [...prev];
-      [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
+      const [moved] = copy.splice(draggedIdx, 1);
+      copy.splice(idx, 0, moved);
       return copy;
     });
+    setDraggedIdx(null);
+    setDragOverIdx(null);
   }
 
-  function moveDown(idx: number) {
-    setFiles((prev) => {
-      if (idx === prev.length - 1) return prev;
-      const copy = [...prev];
-      [copy[idx], copy[idx + 1]] = [copy[idx + 1], copy[idx]];
-      return copy;
-    });
+  function handleDragEnd() {
+    setDraggedIdx(null);
+    setDragOverIdx(null);
   }
 
-  function removeFile(idx: number) {
-    setFiles((prev) => prev.filter((_, i) => i !== idx));
-  }
+  const remaining = pageEntries.filter((p) => !p.removed);
 
   async function handleMerge() {
-    if (files.length < 2) return;
+    if (remaining.length === 0) return;
     setBusy(true);
     setError(null);
 
     try {
-      const outBytes = await mergePdfs(files);
+      const files = fileEntries.map((f) => f.file);
+      const pageOrder = remaining.map((p) => ({
+        fileIndex: fileEntries.findIndex((f) => f.id === p.fileId),
+        pageIndex: p.pageIndex,
+      }));
+      const outBytes = await mergeAndReorderPdfs(files, pageOrder);
       const blob = new Blob([new Uint8Array(outBytes)], {
         type: "application/pdf",
       });
@@ -78,38 +149,19 @@ export default function MergeForm() {
         />
       </div>
 
-      {files.length > 0 && (
+      {fileEntries.length > 0 && (
         <div className="space-y-2">
-          <Label>Reihenfolge ({files.length} Datei(en))</Label>
+          <Label>Dateien</Label>
           <div className="border rounded-md divide-y">
-            {files.map((file, idx) => (
-              <div key={idx} className="flex items-center gap-2 p-2">
-                <span className="text-sm text-muted-foreground w-6">
-                  {idx + 1}.
-                </span>
-                <span className="flex-1 text-sm truncate">{file.name}</span>
+            {fileEntries.map((fe) => (
+              <div key={fe.id} className="flex items-center gap-2 p-2">
+                <span className="flex-1 text-sm truncate">{fe.file.name}</span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => moveUp(idx)}
-                  disabled={idx === 0}
+                  onClick={() => removeFileEntry(fe.id)}
                 >
-                  ↑
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => moveDown(idx)}
-                  disabled={idx === files.length - 1}
-                >
-                  ↓
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeFile(idx)}
-                >
-                  ✕
+                  Entfernen
                 </Button>
               </div>
             ))}
@@ -119,9 +171,57 @@ export default function MergeForm() {
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
+      {pageEntries.length > 0 && (
+        <div className="space-y-2">
+          <Label>
+            Seiten ({remaining.length} von {pageEntries.length} werden
+            zusammengeführt) — per Drag & Drop umsortieren
+          </Label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {pageEntries.map((pageEntry, idx) => {
+              const fe = fileEntries.find((f) => f.id === pageEntry.fileId);
+              if (!fe) return null;
+              return (
+                <div
+                  key={`${pageEntry.fileId}-${pageEntry.pageIndex}`}
+                  draggable
+                  onDragStart={() => handleDragStart(idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDrop={() => handleDrop(idx)}
+                  onDragEnd={handleDragEnd}
+                  className={`border rounded-md p-2 space-y-2 cursor-move transition-all ${
+                    pageEntry.removed ? "opacity-40" : ""
+                  } ${draggedIdx === idx ? "opacity-30" : ""} ${
+                    dragOverIdx === idx && draggedIdx !== idx
+                      ? "border-primary border-2 bg-primary/5"
+                      : ""
+                  }`}
+                >
+                  <div className="flex justify-center pointer-events-none">
+                    <PageThumbnail file={fe.file} pageIndex={pageEntry.pageIndex} />
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground pointer-events-none truncate">
+                    {fe.file.name} · Seite {pageEntry.pageIndex + 1}
+                  </p>
+                  <div className="flex items-center justify-center">
+                    <Button
+                      variant={pageEntry.removed ? "outline" : "ghost"}
+                      size="sm"
+                      onClick={() => togglePageRemoved(idx)}
+                    >
+                      {pageEntry.removed ? "Wiederherstellen" : "Entfernen"}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <Button
         onClick={handleMerge}
-        disabled={files.length < 2 || busy}
+        disabled={remaining.length === 0 || busy}
         className="w-full"
       >
         {busy ? "Führe zusammen..." : "Zusammenführen & Herunterladen"}
