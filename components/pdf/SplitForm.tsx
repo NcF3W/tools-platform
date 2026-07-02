@@ -13,7 +13,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { splitPdfToTiles } from "@/lib/pdf/splitPdf";
-import { calcGrid, PAPER_SIZES_MM, type PaperSize } from "@/lib/pdf/paperSizes";
+import {
+  calcGrid,
+  detectPaperSize,
+  PAPER_SIZES_MM,
+  type PaperSize,
+} from "@/lib/pdf/paperSizes";
 import dynamic from "next/dynamic";
 
 const SplitPreview = dynamic(() => import("@/components/pdf/SplitPreview"), {
@@ -27,6 +32,9 @@ export default function SplitForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [grid, setGrid] = useState<{ cols: number; rows: number } | null>(null);
+  const [sourceFormat, setSourceFormat] = useState<ReturnType<
+    typeof detectPaperSize
+  > | null>(null);
 
   // Grid live berechnen, sobald Datei oder Zielformat sich ändern
   useEffect(() => {
@@ -35,6 +43,7 @@ export default function SplitForm() {
     async function computeGrid() {
       if (!file) {
         setGrid(null);
+        setSourceFormat(null);
         return;
       }
       try {
@@ -42,9 +51,15 @@ export default function SplitForm() {
         const srcDoc = await PDFDocument.load(bytes);
         const [page] = srcDoc.getPages();
         const result = calcGrid(page.getWidth(), page.getHeight(), target);
-        if (!cancelled) setGrid(result);
+        if (!cancelled) {
+          setGrid(result);
+          setSourceFormat(detectPaperSize(page.getWidth(), page.getHeight()));
+        }
       } catch {
-        if (!cancelled) setGrid(null);
+        if (!cancelled) {
+          setGrid(null);
+          setSourceFormat(null);
+        }
       }
     }
 
@@ -98,6 +113,14 @@ export default function SplitForm() {
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           className="block w-full text-sm border rounded-md p-2"
         />
+        {sourceFormat && (
+          <p className="text-sm text-muted-foreground">
+            Erkanntes Format:{" "}
+            {sourceFormat.size
+              ? `${sourceFormat.size} (${sourceFormat.widthMm} × ${sourceFormat.heightMm} mm)`
+              : `${sourceFormat.widthMm} × ${sourceFormat.heightMm} mm`}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">

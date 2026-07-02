@@ -8,12 +8,37 @@ export const PAPER_SIZES_MM = {
 
 export type PaperSize = keyof typeof PAPER_SIZES_MM;
 
+const PT_TO_MM = 0.352778;
+
+export function detectPaperSize(srcWidthPt: number, srcHeightPt: number) {
+  const widthMm = srcWidthPt * PT_TO_MM;
+  const heightMm = srcHeightPt * PT_TO_MM;
+
+  // Hoch- und Querformat berücksichtigen
+  const longSide = Math.max(widthMm, heightMm);
+  const shortSide = Math.min(widthMm, heightMm);
+
+  const TOLERANCE = 0.02;
+  let match: PaperSize | null = null;
+  for (const size of Object.keys(PAPER_SIZES_MM) as PaperSize[]) {
+    const { w, h } = PAPER_SIZES_MM[size];
+    if (
+      Math.abs(longSide - h) / h < TOLERANCE &&
+      Math.abs(shortSide - w) / w < TOLERANCE
+    ) {
+      match = size;
+      break;
+    }
+  }
+
+  return { size: match, widthMm: Math.round(widthMm), heightMm: Math.round(heightMm) };
+}
+
 export function calcGrid(
   srcWidthPt: number,
   srcHeightPt: number,
   target: PaperSize,
 ) {
-  const PT_TO_MM = 0.352778;
   const srcW = srcWidthPt * PT_TO_MM;
   const srcH = srcHeightPt * PT_TO_MM;
   const { w, h } = PAPER_SIZES_MM[target];
