@@ -12,6 +12,7 @@ import {
   ListOrdered,
   FileImage,
   Wand2,
+  PenLine,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -27,7 +28,7 @@ export default function PdfPage() {
               <Scissors className="w-6 h-6 mb-2 text-primary" />
               <CardTitle>Poster aufteilen</CardTitle>
               <CardDescription>
-                A1 → 4× A3 zum selbst Ausdrucken
+                A0/A1-Poster in A3/A4-Kacheln zum selbst Ausdrucken
               </CardDescription>
             </CardHeader>
           </Card>
@@ -50,6 +51,18 @@ export default function PdfPage() {
               <CardTitle>Seiten anordnen & löschen</CardTitle>
               <CardDescription>
                 Reihenfolge ändern, einzelne Seiten entfernen
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/pdf/edit-text">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <PenLine className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Text bearbeiten</CardTitle>
+              <CardDescription>
+                Text löschen und neuen Text einfügen
               </CardDescription>
             </CardHeader>
           </Card>

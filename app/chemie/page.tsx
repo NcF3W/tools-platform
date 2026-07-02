@@ -5,7 +5,14 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { FlaskConical, TrendingUp, Waves, Zap, GitFork } from "lucide-react";
+import {
+  FlaskConical,
+  TrendingUp,
+  Waves,
+  Zap,
+  GitFork,
+  Calculator,
+} from "lucide-react";
 
 export default function ChemiePage() {
   return (
@@ -68,6 +75,19 @@ export default function ChemiePage() {
               <CardTitle>Ligandenfeldaufspaltung</CardTitle>
               <CardDescription>
                 d-Orbitalaufspaltung, Elektronenbesetzung, CFSE
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/chemie/einheiten">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader>
+              <Calculator className="w-6 h-6 mb-2 text-primary" />
+              <CardTitle>Einheiten-Rechner</CardTitle>
+              <CardDescription>
+                Stoffmenge, Masse, Volumen, Dichte und Konzentration
+                umrechnen
               </CardDescription>
             </CardHeader>
           </Card>

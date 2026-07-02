@@ -6,7 +6,8 @@ export default function SplitPage() {
       <div>
         <h1 className="text-2xl font-bold">Poster aufteilen</h1>
         <p className="text-muted-foreground">
-          A1 → 4× A3 zum selbst Ausdrucken
+          Großformat (z. B. A0 oder A1) auf A3/A4-Kacheln zum selbst
+          Ausdrucken
         </p>
       </div>
       <SplitForm />
