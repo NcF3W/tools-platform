@@ -31,7 +31,7 @@ export default function SplitForm() {
   const [overlap, setOverlap] = useState(5);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [grid, setGrid] = useState<{ cols: number; rows: number } | null>(null);
+  const [grid, setGrid] = useState<ReturnType<typeof calcGrid> | null>(null);
   const [sourceFormat, setSourceFormat] = useState<ReturnType<
     typeof detectPaperSize
   > | null>(null);
@@ -154,9 +154,17 @@ export default function SplitForm() {
         <div className="space-y-2">
           <Label>
             Vorschau ({grid.cols}× {grid.rows} = {grid.cols * grid.rows}{" "}
-            Blätter, erste Seite)
+            Blätter{" "}
+            {grid.orientation === "landscape" ? `${target} quer` : `${target} hoch`}
+            , erste Seite)
           </Label>
           <SplitPreview file={file} cols={grid.cols} rows={grid.rows} />
+          {grid.orientation === "landscape" && (
+            <p className="text-sm text-muted-foreground">
+              Für möglichst wenige Blätter werden die Kacheln im Querformat
+              zugeschnitten – beim Drucken das Papier entsprechend drehen.
+            </p>
+          )}
         </div>
       )}
 

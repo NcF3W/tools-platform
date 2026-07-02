@@ -49,8 +49,26 @@ export function calcGrid(
   // = 2×A3-Höhe) eine ganze zusätzliche Reihe/Spalte erzwingen.
   const TOLERANCE = 0.02;
 
-  const cols = Math.max(1, Math.ceil(srcW / w - TOLERANCE));
-  const rows = Math.max(1, Math.ceil(srcH / h - TOLERANCE));
+  function gridFor(tileW: number, tileH: number) {
+    const cols = Math.max(1, Math.ceil(srcW / tileW - TOLERANCE));
+    const rows = Math.max(1, Math.ceil(srcH / tileH - TOLERANCE));
+    return { cols, rows, tiles: cols * rows };
+  }
 
-  return { cols, rows };
+  // Beide Ausrichtungen des Zielformats prüfen (Hoch- und Querformat),
+  // damit z.B. eine A3-Seite als 1×2 A4-Blätter (quer) statt als
+  // unnötige 2×2-Kachelung erkannt wird.
+  const portrait = gridFor(w, h);
+  const landscape = gridFor(h, w);
+
+  const useLandscape = landscape.tiles < portrait.tiles;
+  const best = useLandscape ? landscape : portrait;
+
+  return {
+    cols: best.cols,
+    rows: best.rows,
+    orientation: (useLandscape ? "landscape" : "portrait") as
+      | "landscape"
+      | "portrait",
+  };
 }
