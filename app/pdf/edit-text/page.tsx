@@ -1,4 +1,4 @@
-import EditTextForm from "@/components/pdf/EditTextForm";
+import EditTextForm from "@/components/pdf/EditTextFormLoader";
 
 export default function EditTextPage() {
   return (
