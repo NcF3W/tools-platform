@@ -82,6 +82,103 @@ interface FormulaEntry {
   note?: string;
 }
 
+const STEM_NAMES = [
+  "Meth", "Eth", "Prop", "But", "Pent", "Hex",
+  "Hept", "Oct", "Non", "Dec", "Undec", "Dodec",
+];
+
+function carbonChain(count: number): string {
+  return "C".repeat(count);
+}
+
+// Generiert die homologen Reihen (Alkane, Alkene, Alkine, Aldehyde,
+// primäre Carbonsäuren) bis C12 als jeweils unverzweigte/endständige
+// Standardstruktur. Summenformeln sind ab einer gewissen Kettenlänge nicht
+// mehr eindeutig (Stellungs-/Kettenisomere, Ringschluss, isomere
+// Carbonylverbindungen) - das wird über den `note`-Text transparent gemacht.
+function buildHomologousSeries(): { formula: string; entry: FormulaEntry }[] {
+  const entries: { formula: string; entry: FormulaEntry }[] = [];
+
+  for (let n = 1; n <= 12; n++) {
+    const stem = STEM_NAMES[n - 1];
+
+    // Alkan: CnH(2n+2)
+    entries.push({
+      formula: `C${n}H${2 * n + 2}`,
+      entry: {
+        smiles: carbonChain(n),
+        name: `${stem}an`,
+        note:
+          n >= 4
+            ? `C${n}H${2 * n + 2} ist nicht eindeutig - ab dieser Kettenlänge gibt es auch verzweigte Alkane (z. B. Isobutan bei C4H10). Angezeigt: n-${stem}an.`
+            : undefined,
+      },
+    });
+
+    // Aldehyd: CnH2nO, endständige Carbonylgruppe
+    const aldehydeName =
+      n === 1 ? "Methanal (Formaldehyd)" : n === 2 ? "Ethanal (Acetaldehyd)" : `${stem}anal`;
+    entries.push({
+      formula: `C${n}H${2 * n}O`,
+      entry: {
+        smiles: `${carbonChain(n - 1)}C=O`,
+        name: aldehydeName,
+        note:
+          n >= 3
+            ? `C${n}H${2 * n}O ist nicht eindeutig - es gibt auch das isomere Keton ${stem}an-2-on. Angezeigt: ${aldehydeName}.`
+            : undefined,
+      },
+    });
+
+    // Primäre Carbonsäure: CnH2nO2, unverzweigte Kette
+    const acidName =
+      n === 1 ? "Methansäure (Ameisensäure)" : n === 2 ? "Essigsäure (Ethansäure)" : `${stem}ansäure`;
+    entries.push({
+      formula: `C${n}H${2 * n}O2`,
+      entry: {
+        smiles: `${carbonChain(n - 1)}C(=O)O`,
+        name: acidName,
+        note:
+          n >= 4
+            ? `C${n}H${2 * n}O2 ist nicht eindeutig - ab dieser Kettenlänge gibt es auch verzweigte Carbonsäuren (z. B. Isobuttersäure bei C4H8O2). Angezeigt: n-${acidName}.`
+            : undefined,
+      },
+    });
+
+    if (n >= 2) {
+      // Alken: CnH2n, endständige Doppelbindung
+      const alkeneName = n === 2 ? "Ethen (Ethylen)" : n === 3 ? "Propen" : `${stem}-1-en`;
+      entries.push({
+        formula: `C${n}H${2 * n}`,
+        entry: {
+          smiles: `C=C${carbonChain(n - 2)}`,
+          name: alkeneName,
+          note:
+            n >= 3
+              ? `C${n}H${2 * n} ist nicht eindeutig - es gibt z. B. Stellungsisomere und das entsprechende Cycloalkan (z. B. Cyclopropan bei C3H6). Angezeigt: ${alkeneName}.`
+              : undefined,
+        },
+      });
+
+      // Alkin: CnH(2n-2), endständige Dreifachbindung
+      const alkyneName = n === 2 ? "Ethin (Acetylen)" : n === 3 ? "Propin" : `${stem}-1-in`;
+      entries.push({
+        formula: `C${n}H${2 * n - 2}`,
+        entry: {
+          smiles: `C#C${carbonChain(n - 2)}`,
+          name: alkyneName,
+          note:
+            n >= 3
+              ? `C${n}H${2 * n - 2} ist nicht eindeutig - es gibt z. B. Stellungsisomere, Diene und Cycloalkene mit gleicher Formel. Angezeigt: ${alkyneName}.`
+              : undefined,
+        },
+      });
+    }
+  }
+
+  return entries;
+}
+
 // Kleine, kuratierte Auswahl gängiger einfacher Moleküle. Summenformeln sind
 // nicht eindeutig (mehrere Isomere möglich) - hier wird jeweils die
 // gebräuchlichste Verbindung hinterlegt, bei bekannten Mehrdeutigkeiten mit
@@ -98,7 +195,6 @@ const FORMULA_DB: { formula: string; entry: FormulaEntry }[] = [
   { formula: "H2O2", entry: { smiles: "OO", name: "Wasserstoffperoxid" } },
   { formula: "CO2", entry: { smiles: "O=C=O", name: "Kohlenstoffdioxid" } },
   { formula: "CO", entry: { smiles: "[C-]#[O+]", name: "Kohlenstoffmonoxid" } },
-  { formula: "CH4", entry: { smiles: "C", name: "Methan" } },
   { formula: "NH3", entry: { smiles: "N", name: "Ammoniak" } },
   { formula: "HCl", entry: { smiles: "Cl", name: "Chlorwasserstoff" } },
   { formula: "HF", entry: { smiles: "F", name: "Fluorwasserstoff" } },
@@ -127,7 +223,6 @@ const FORMULA_DB: { formula: string; entry: FormulaEntry }[] = [
     entry: { smiles: "[Ca+2].[OH-].[OH-]", name: "Calciumhydroxid (Löschkalk)" },
   },
   { formula: "NH4Cl", entry: { smiles: "[NH4+].[Cl-]", name: "Ammoniumchlorid" } },
-  { formula: "CH2O", entry: { smiles: "C=O", name: "Formaldehyd" } },
   { formula: "CH4O", entry: { smiles: "CO", name: "Methanol" } },
   {
     formula: "C2H6O",
@@ -137,19 +232,6 @@ const FORMULA_DB: { formula: string; entry: FormulaEntry }[] = [
       note: "C2H6O ist nicht eindeutig - es gibt z. B. auch Dimethylether. Angezeigt: Ethanol.",
     },
   },
-  { formula: "C2H4", entry: { smiles: "C=C", name: "Ethen (Ethylen)" } },
-  { formula: "C2H2", entry: { smiles: "C#C", name: "Ethin (Acetylen)" } },
-  { formula: "C2H6", entry: { smiles: "CC", name: "Ethan" } },
-  { formula: "C3H8", entry: { smiles: "CCC", name: "Propan" } },
-  {
-    formula: "C4H10",
-    entry: {
-      smiles: "CCCC",
-      name: "n-Butan",
-      note: "C4H10 ist nicht eindeutig - es gibt auch Isobutan. Angezeigt: n-Butan.",
-    },
-  },
-  { formula: "C2H4O2", entry: { smiles: "CC(=O)O", name: "Essigsäure" } },
   { formula: "C6H6", entry: { smiles: "c1ccccc1", name: "Benzol" } },
   {
     formula: "C6H12O6",
@@ -160,14 +242,6 @@ const FORMULA_DB: { formula: string; entry: FormulaEntry }[] = [
     },
   },
   {
-    formula: "C3H6O",
-    entry: {
-      smiles: "CC(=O)C",
-      name: "Aceton",
-      note: "C3H6O ist nicht eindeutig - es gibt z. B. auch Propanal. Angezeigt: Aceton.",
-    },
-  },
-  {
     formula: "C3H8O",
     entry: {
       smiles: "CCCO",
@@ -175,15 +249,19 @@ const FORMULA_DB: { formula: string; entry: FormulaEntry }[] = [
       note: "C3H8O ist nicht eindeutig - es gibt z. B. auch 2-Propanol. Angezeigt: 1-Propanol.",
     },
   },
+  ...buildHomologousSeries(),
 ];
 
-const FORMULA_MAP: Map<string, FormulaEntry> = new Map(
-  FORMULA_DB.map(({ formula, entry }) => {
-    const counts = parseFormula(formula);
-    if (!counts) throw new Error(`Interne Summenformel ungültig: ${formula}`);
-    return [hillKey(counts), entry];
-  }),
-);
+const FORMULA_MAP: Map<string, FormulaEntry> = new Map();
+for (const { formula, entry } of FORMULA_DB) {
+  const counts = parseFormula(formula);
+  if (!counts) throw new Error(`Interne Summenformel ungültig: ${formula}`);
+  const key = hillKey(counts);
+  if (FORMULA_MAP.has(key)) {
+    throw new Error(`Doppelter Summenformel-Eintrag: ${key} (${formula})`);
+  }
+  FORMULA_MAP.set(key, entry);
+}
 
 export type FormulaLookupResult =
   | { smiles: string; name: string; note?: string }
