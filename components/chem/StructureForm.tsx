@@ -43,6 +43,7 @@ export default function StructureForm() {
   const [mode, setMode] = useState<InputMode>("smiles");
   const [input, setInput] = useState(MODE_CONFIG.smiles.defaultValue);
   const [showCarbons, setShowCarbons] = useState(false);
+  const [showHydrogens, setShowHydrogens] = useState(false);
   const [svgDataUrl, setSvgDataUrl] = useState<string | null>(null);
   const [rawSvg, setRawSvg] = useState<string | null>(null);
   const [chemfigCode, setChemfigCode] = useState<string | null>(null);
@@ -98,7 +99,10 @@ export default function StructureForm() {
         return;
       }
 
-      const molblock = mol.get_molblock();
+      // Bei aktivierter Checkbox: Molekül mit expliziten H-Atomen (inkl. eigener
+      // Bindungsstriche, z. B. H-Cl oder O-H) statt impliziter H-Zahl im Atomlabel.
+      const renderMol = showHydrogens ? RDKit.get_mol(mol.add_hs()) : mol;
+      const molblock = renderMol.get_molblock();
 
       const atomLabels: Record<number, string> = {};
       if (showCarbons) {
@@ -106,7 +110,7 @@ export default function StructureForm() {
           if (el === "C") atomLabels[idx] = "C";
         });
       }
-      const svgText = mol.get_svg_with_highlights(
+      const svgText = renderMol.get_svg_with_highlights(
         JSON.stringify({ width: 350, height: 300, atomLabels }),
       );
       const cleanedSvg = svgText.replace(/<\?xml[^>]*\?>/, "").trim();
@@ -118,9 +122,13 @@ export default function StructureForm() {
       const code = molblockToChemfig(molblock, { showCarbons });
       setChemfigCode(code);
 
+      if (renderMol !== mol) renderMol.delete();
       mol.delete();
     } catch (err) {
-      console.error(err);
+      // console.warn statt console.error: Next.js zeigt console.error im Dev-Overlay an,
+      // diese Fehler (ungültige Eingabe, CAS nicht gefunden, ...) werden aber bereits
+      // sauber über setError() im UI angezeigt.
+      console.warn(err);
       setError(
         err instanceof Error ? err.message : "Beim Rendern ist etwas schiefgelaufen.",
       );
@@ -215,6 +223,17 @@ export default function StructureForm() {
         />
         <Label htmlFor="show-carbons" className="font-normal">
           Kohlenstoff-Atome (C) in der Strukturformel einzeln anzeigen
+        </Label>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="show-hydrogens"
+          checked={showHydrogens}
+          onCheckedChange={(checked) => setShowHydrogens(checked === true)}
+        />
+        <Label htmlFor="show-hydrogens" className="font-normal">
+          Wasserstoff-Atome (H) mit Bindungsstrichen anzeigen (z. B. H-Cl, O-H)
         </Label>
       </div>
 

@@ -12,14 +12,15 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const url = `https://pubchem.ncbi.gov/rest/pug/compound/name/${encodeURIComponent(
+  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(
     cas,
-  )}/property/CanonicalSMILES,IUPACName,MolecularFormula/JSON`;
+  )}/property/SMILES,IUPACName,MolecularFormula/JSON`;
 
   let res: Response;
   try {
     res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-  } catch {
+  } catch (err) {
+    console.error("PubChem-Anfrage fehlgeschlagen:", err);
     return NextResponse.json(
       { error: "PubChem ist gerade nicht erreichbar." },
       { status: 502 },
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
   const data = await res.json();
   const props = data?.PropertyTable?.Properties?.[0];
 
-  if (!props?.CanonicalSMILES) {
+  if (!props?.SMILES) {
     return NextResponse.json(
       { error: `Keine Struktur zu CAS-Nummer ${cas} gefunden.` },
       { status: 404 },
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({
-    smiles: props.CanonicalSMILES as string,
+    smiles: props.SMILES as string,
     name: (props.IUPACName as string | undefined) ?? null,
     formula: (props.MolecularFormula as string | undefined) ?? null,
   });

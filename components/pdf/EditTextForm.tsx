@@ -27,9 +27,21 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 const TARGET_WIDTH = 760;
 
 const FONT_OPTIONS: { value: PdfFontFamily; label: string; css: string }[] = [
-  { value: "Helvetica", label: "Helvetica (serifenlos)", css: "Helvetica, Arial, sans-serif" },
-  { value: "TimesRoman", label: "Times (Serifen)", css: '"Times New Roman", Times, serif' },
-  { value: "Courier", label: "Courier (Monospace)", css: '"Courier New", Courier, monospace' },
+  {
+    value: "Helvetica",
+    label: "Helvetica (serifenlos)",
+    css: "Helvetica, Arial, sans-serif",
+  },
+  {
+    value: "TimesRoman",
+    label: "Times (Serifen)",
+    css: '"Times New Roman", Times, serif',
+  },
+  {
+    value: "Courier",
+    label: "Courier (Monospace)",
+    css: '"Courier New", Courier, monospace',
+  },
 ];
 
 function cssFontFamily(family: PdfFontFamily): string {
@@ -60,7 +72,9 @@ export default function EditTextForm() {
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageStates, setPageStates] = useState<Map<number, PageState>>(new Map());
+  const [pageStates, setPageStates] = useState<Map<number, PageState>>(
+    new Map(),
+  );
   const [loadingPage, setLoadingPage] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -196,7 +210,11 @@ export default function EditTextForm() {
     updatePageState(pageIndex, { deleted });
   }
 
-  function findItemAt(state: PageState, left: number, top: number): OverlayTextItem | null {
+  function findItemAt(
+    state: PageState,
+    left: number,
+    top: number,
+  ): OverlayTextItem | null {
     let fallback: OverlayTextItem | null = null;
     for (let i = 0; i < state.items.length; i++) {
       const box = state.items[i].canvasBox;
@@ -218,8 +236,14 @@ export default function EditTextForm() {
     const rect = img.getBoundingClientRect();
     const scaleX = img.naturalWidth / rect.width;
     const scaleY = img.naturalHeight / rect.height;
-    const x = Math.min(img.naturalWidth - 1, Math.max(0, Math.floor(left * scaleX)));
-    const y = Math.min(img.naturalHeight - 1, Math.max(0, Math.floor(top * scaleY)));
+    const x = Math.min(
+      img.naturalWidth - 1,
+      Math.max(0, Math.floor(left * scaleX)),
+    );
+    const y = Math.min(
+      img.naturalHeight - 1,
+      Math.max(0, Math.floor(top * scaleY)),
+    );
 
     const canvas = document.createElement("canvas");
     canvas.width = img.naturalWidth;
@@ -252,7 +276,10 @@ export default function EditTextForm() {
       : fontSize;
 
     const baselineTop = top + insertionFontSize * pageState.viewport.scale;
-    const [pdfX, pdfY] = pageState.viewport.convertToPdfPoint(left, baselineTop);
+    const [pdfX, pdfY] = pageState.viewport.convertToPdfPoint(
+      left,
+      baselineTop,
+    );
 
     const insertion: DisplayInsertion = {
       id: nextInsertionId.current++,
@@ -378,7 +405,9 @@ export default function EditTextForm() {
                 variant="outline"
                 size="icon-sm"
                 disabled={pageIndex >= numPages - 1}
-                onClick={() => setPageIndex((p) => Math.min(numPages - 1, p + 1))}
+                onClick={() =>
+                  setPageIndex((p) => Math.min(numPages - 1, p + 1))
+                }
               >
                 <ChevronRight />
               </Button>
@@ -386,7 +415,10 @@ export default function EditTextForm() {
 
             <div className="space-y-1">
               <Label className="text-xs">Schriftart (neuer Text)</Label>
-              <Select value={fontFamily} onValueChange={(v) => setFontFamily(v as PdfFontFamily)}>
+              <Select
+                value={fontFamily}
+                onValueChange={(v) => setFontFamily(v as PdfFontFamily)}
+              >
                 <SelectTrigger className="w-44">
                   <SelectValue />
                 </SelectTrigger>
@@ -408,7 +440,9 @@ export default function EditTextForm() {
                 max={72}
                 className="w-20"
                 value={fontSize}
-                onChange={(e) => setFontSize(Math.max(6, Number(e.target.value) || 14))}
+                onChange={(e) =>
+                  setFontSize(Math.max(6, Number(e.target.value) || 14))
+                }
               />
             </div>
 
@@ -446,21 +480,26 @@ export default function EditTextForm() {
 
           <p className="text-sm text-muted-foreground">
             Auf vorhandenen Text klicken, um ihn zu löschen (rot markiert,
-            erneut klicken macht es rückgängig). Auf eine leere Stelle
-            klicken, um neuen Text einzufügen – klickt man dabei auf gelöschten
-            Text, wird dessen Schriftgröße automatisch übernommen. Mit der
-            Pipette lässt sich die Löschfarbe von der Seite abgreifen, falls
-            der Hintergrund nicht weiß ist.
+            erneut klicken macht es rückgängig). Auf eine leere Stelle klicken,
+            um neuen Text einzufügen – klickt man dabei auf gelöschten Text,
+            wird dessen Schriftgröße automatisch übernommen. Mit der Pipette
+            lässt sich die Löschfarbe von der Seite abgreifen, falls der
+            Hintergrund nicht weiß ist.
           </p>
 
           <div className="border rounded-md p-2 overflow-auto bg-muted">
             {loadingPage && !pageState && (
-              <p className="text-sm text-muted-foreground p-4">Seite wird geladen...</p>
+              <p className="text-sm text-muted-foreground p-4">
+                Seite wird geladen...
+              </p>
             )}
             {pageState && (
               <div
                 className="relative inline-block bg-white"
-                style={{ width: pageState.viewport.width, height: pageState.viewport.height }}
+                style={{
+                  width: pageState.viewport.width,
+                  height: pageState.viewport.height,
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -512,7 +551,9 @@ export default function EditTextForm() {
                       <input
                         autoFocus
                         value={ins.text}
-                        onChange={(e) => updateInsertionText(ins.id, e.target.value)}
+                        onChange={(e) =>
+                          updateInsertionText(ins.id, e.target.value)
+                        }
                         className="bg-transparent border border-dashed border-primary/60 outline-none px-0.5 min-w-[2ch]"
                         style={{
                           fontSize: ins.fontSize * pageState.viewport.scale,
@@ -536,14 +577,18 @@ export default function EditTextForm() {
             )}
           </div>
 
-          <Button onClick={handleDownload} disabled={busy || !hasChanges} className="w-full">
+          <Button
+            onClick={handleDownload}
+            disabled={busy || !hasChanges}
+            className="w-full"
+          >
             {busy ? "Erzeuge PDF..." : "Bearbeitetes PDF herunterladen"}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Hinweis: Gelöschter Text wird mit einem Rechteck in der
-            gewählten Löschfarbe überdeckt. Neuer Text wird als zusätzliche
-            Ebene eingefügt – der ursprüngliche Textfluss im PDF bleibt
-            technisch bestehen, nur die Ansicht ändert sich.
+            Hinweis: Gelöschter Text wird mit einem Rechteck in der gewählten
+            Löschfarbe überdeckt. Neuer Text wird als zusätzliche Ebene
+            eingefügt – der ursprüngliche Textfluss im PDF bleibt technisch
+            bestehen, nur die Ansicht ändert sich.
           </p>
         </>
       )}
