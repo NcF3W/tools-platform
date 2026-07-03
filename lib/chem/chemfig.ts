@@ -61,7 +61,15 @@ function roundAngle(deg: number): number {
   return (Math.round(norm / 15) * 15) % 360;
 }
 
-export function molblockToChemfig(molblock: string): string {
+export function getAtomElements(molblock: string): string[] {
+  return parseMolblock(molblock).atoms.map((a) => a.element);
+}
+
+export function molblockToChemfig(
+  molblock: string,
+  options?: { showCarbons?: boolean },
+): string {
+  const showCarbons = options?.showCarbons ?? false;
   const { atoms, bonds } = parseMolblock(molblock);
   const n = atoms.length;
   if (n === 0) return "";
@@ -89,7 +97,7 @@ export function molblockToChemfig(molblock: string): string {
 
   function atomLabel(i: number): string {
     const el = atoms[i].element;
-    if (el === "C") return ""; // Kohlenstoff bleibt unsichtbar (Skelettformel-Konvention)
+    if (el === "C" && !showCarbons) return ""; // Skelettformel-Konvention
     const h = hCount[i];
     if (h === 0) return el;
     if (h === 1) return `${el}H`;
