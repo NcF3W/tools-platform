@@ -72,3 +72,37 @@ export function calcGrid(
       | "portrait",
   };
 }
+
+// Berechnet, wie eine Quellseite (beliebiges Format, egal ob größer oder
+// kleiner als das Zielformat) proportional auf ein einzelnes Zielblatt
+// passt. Es wird die Ausrichtung (Hoch-/Querformat) gewählt, die den
+// größeren Skalierungsfaktor erlaubt (= wenigster Weißraum).
+export function calcFit(
+  srcWidthPt: number,
+  srcHeightPt: number,
+  target: PaperSize,
+) {
+  const srcW = srcWidthPt * PT_TO_MM;
+  const srcH = srcHeightPt * PT_TO_MM;
+  const { w, h } = PAPER_SIZES_MM[target];
+
+  function fit(pageWidthMm: number, pageHeightMm: number) {
+    const scale = Math.min(pageWidthMm / srcW, pageHeightMm / srcH);
+    return { scale, pageWidthMm, pageHeightMm };
+  }
+
+  const portrait = fit(w, h);
+  const landscape = fit(h, w);
+
+  const useLandscape = landscape.scale > portrait.scale;
+  const best = useLandscape ? landscape : portrait;
+
+  return {
+    scale: best.scale,
+    pageWidthMm: best.pageWidthMm,
+    pageHeightMm: best.pageHeightMm,
+    orientation: (useLandscape ? "landscape" : "portrait") as
+      | "landscape"
+      | "portrait",
+  };
+}
